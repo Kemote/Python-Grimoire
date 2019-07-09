@@ -1,4 +1,6 @@
-list = [['pike', '5'],['hearts','A'],['hearts','3'],['spades', '4'],['spades', '2'],['hearts','5'],['hearts','7']]
+#TEST SYNC
+
+list = [['pike', 'J'],['hearts','9'],['hearts','K'],['spades', 'Q'],['spades', '10'],['hearts','5'],['hearts','7']]
 
 for i in list:
    if i[1] == 'A':
@@ -18,21 +20,20 @@ def check_flush(cards):
    return False, 0
 
 def check_streight(cards):
-   #streight = [int(i[1]) for i in cards]
-   #streight.sort()
-   #streight = dict.fromkeys(streight)
-   streight = []
-   figures = []
+   streight = [int(i[1]) for i in cards]
 
-   for i in cards:
-       if i not in streight:
-           streight.append(i)
-
+   for i in streight:
+       if streight.count(i) != 1:
+           streight.remove(i)
+   streight.sort()
    print(streight)
    if len(streight) < 5:
        return False
    for i in range(len(streight) - 4):
-       True
+       if streight[-i] - streight[-i-4] == 4:
+           return True, streight[-i]
+   if streight[-1] - streight[-4] == 3 and streight[0] == 1:
+       return True, 14
    #tutaj pętle sprawdzającą możliwości strita porzadnie zrobiona ta moze miec pomylki
 
 
