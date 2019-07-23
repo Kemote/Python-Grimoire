@@ -9,7 +9,7 @@ class Player: #klasa trzymajaca info o graczu
        self.__cards = []
 
    def deal(self, deck):            #metoda pozwalająca wylosować kart dla gracza z obecnej talii
-       self.__cards = deck.deal(3) #jak to teksas zawsze losuje się na początek 3 karty
+       self.__cards = deck.deal(2) #jak to teksas zawsze losuje się na początek 3 karty
 
    @property
    def cards_remove(self):
@@ -18,7 +18,7 @@ class Player: #klasa trzymajaca info o graczu
    @property
    def cards(self):
        cards_on_hands = []
-       for i in range(3):
+       for i in range(2):
            cards_on_hands.append([self.__cards[i].color,self.__cards[i].figure])
        return cards_on_hands
 
@@ -101,9 +101,10 @@ class Stool:
        return cards_on_hands
 
    def check_poker_hand(self, player):
-
-       cards = self.players[player].cards() + self.cards
-       print(cards)
+       print(self.players[player].cards)
+       print(str(self.cards()))
+       cards = self.players[player].cards + self.cards()
+       print("test takie kary sprawdzane " + str(cards))
        for i in cards:
            if i[1] == 'A':
                i[1] = '1'
@@ -115,7 +116,9 @@ class Stool:
                i[1] = '13'
 
        def check_high(cards):
+           print("CARDS " + str(cards))
            high = [int(i[1]) for i in cards]
+           print("HIGH", high)
            if min(high) == 1:
                return True, 14, "High card"
            return True, max(high), "High card"
@@ -134,17 +137,22 @@ class Stool:
 
        # na bank poprawic szyszukiwania dwuch par!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
        def check_two_pairs(cards):
-           first_pair = check_one_pair(cards)
-           if first_pair[0]:
-               for i in cards:
-                   if i[1] == first_pair[1]:
-                       cards.remove(i)
+           two_pairs = cards
+           #print("first pari", two_pairs)
+           first_pair = check_one_pair(two_pairs)
+           if first_pair:
+               for i in two_pairs:
+                   #print(i[1], first_pair[1])
+                   if int(i[1]) == int(first_pair[1]):
+                       #print("T")
+                       two_pairs.remove(i)
                if first_pair[1] == '14':
-                   for i in cards:
+                   for i in two_pairs:
                        if i[1] == '1':
-                           cards.remove(i)
-               cards.reverse()
-               sec_pair = check_one_pair(cards)
+                           two_pairs.remove(i)
+               #cards.reverse()
+               #print("secon pari", two_pairs)
+               sec_pair = check_one_pair(two_pairs)
                if sec_pair[0]:
                    return first_pair, sec_pair, "Two pair"
            return False, 0, "None"
@@ -165,7 +173,6 @@ class Stool:
                if streight.count(i) != 1:
                    streight.remove(i)
            streight.sort()
-           print(streight)
            if len(streight) < 5:
                return False, 0, "None"
            for i in range(len(streight) - 4):
@@ -213,7 +220,11 @@ class Stool:
        def check_poker(cards):
            def check():
                for i in range(1, 3):
-                   if (int(cards[-i][1]) - int(cards[-i - 4][1]) == 4 and check_flush(cards[-i - 4:-i])):
+                   #print("-----------------------------------------------------")
+                   #print(check_streight(cards[-i - 4:-i])[0])
+                   #print(check_flush(cards[-i - 4:-i])[0])
+                   #print("-----------------------------------------------------")
+                   if check_streight(cards[-i - 4:-i])[0] and check_flush(cards[-i - 4:-i])[0]:
                        return True, cards[-i][1], "Streight flush"
                return False, 0, "None"
 
@@ -264,14 +275,14 @@ player1.deal(talia0)
 
 print("Hi " + player0.name + " and " + player1.name +" you booth have 1000 chips to play \n")
 
-game1 = Stool(player0, player1)
+game0 = Stool(player0, player1)
 print(player0.name + " cards " + str(player0.cards))
 print(player1.name + " cards " + str(player1.cards) + "\n")
 
-game1.deal(talia0, 5)
+game0.deal(talia0, 5)
 
-print("Karta na stole " + str(game1.cards()) + "\n")
-print(game1.check_poker_hand(0))
+print("Karta na stole " + str(game0.cards()) + "\n")
+print(game0.check_poker_hand(0))
 
 
 #konies testowego modulu rozgrywki dla dwych graczy----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

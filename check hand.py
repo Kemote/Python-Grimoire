@@ -1,6 +1,6 @@
 #TEST SYNC
 
-list = [['hearts', 'J'],['vfs','2'],['hearts','2'],['hearts', 'Q'],['hearts', '10'],['spades','5'],['spades','7']]
+list = [['hearts', 'J'],['vfs','2'],['hearts','K'],['hearts', '4'],['hearts', '10'],['spades','K'],['spades','7']]
 
 for i in list:
    if i[1] == 'A':
@@ -146,5 +146,5 @@ def check_hand(cards):
     if check_high(cards)[0]:
         return check_high(cards)
 
-test = check_hand(list)
+test = check_one_pair(list)
 print("wynik to", test)
