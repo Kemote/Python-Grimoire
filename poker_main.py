@@ -101,10 +101,11 @@ class Stool:
        return cards_on_hands
 
    def check_poker_hand(self, player):
-       print(self.players[player].cards)
-       print(str(self.cards()))
+       #print(self.players[player].cards)
+       #print(str(self.cards()))
+       cards = []
        cards = self.players[player].cards + self.cards()
-       print("test takie kary sprawdzane " + str(cards))
+       #print("test takie kary sprawdzane " + str(cards))
        for i in cards:
            if i[1] == 'A':
                i[1] = '1'
@@ -133,7 +134,7 @@ class Stool:
            for i in pair:
                if pair.count(i) == 2:
                    return True, i, "Pair"
-           return False, 0, "None"
+           return False, 0, "None one pair"
 
        # na bank poprawic szyszukiwania dwuch par!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
        def check_two_pairs(cards):
@@ -155,7 +156,7 @@ class Stool:
                sec_pair = check_one_pair(two_pairs)
                if sec_pair[0]:
                    return first_pair, sec_pair, "Two pair"
-           return False, 0, "None"
+           return False, 0, "None two pairs"
 
        def check_three_kind(cards):
            kind = [str(i[1]) for i in cards]
@@ -164,7 +165,7 @@ class Stool:
                if kind.count(i) == 3:
                    if int(i) == 1: i = 14
                    return True, i, "Three of kind"
-           return False, 0, "None"
+           return False, 0, "None three of kind"
 
        def check_streight(cards):
            streight = [int(i[1]) for i in cards]
@@ -174,7 +175,7 @@ class Stool:
                    streight.remove(i)
            streight.sort()
            if len(streight) < 5:
-               return False, 0, "None"
+               return False, 0, "None streight"
            for i in range(len(streight) - 4):
                if streight[-i] - streight[-i - 4] == 4:
                    return True, streight[-i], "Streight"
@@ -188,7 +189,7 @@ class Stool:
            for i in ['spades', 'hearts', 'clubs', 'diamonds']:
                if color.count(i) >= 5:
                    return True, i, "Flush"
-           return False, 0, "None"
+           return False, 0, "None flush"
 
        def check_full_house(cards):
            three = check_three_kind(cards)
@@ -206,7 +207,7 @@ class Stool:
                pair = check_one_pair(cards)
                if pair[0]:
                    return True, three, pair, "Full house"
-           return False, 0, "None"
+           return False, 0, "None full house"
 
        def check_four_of_kind(cards):
            kind = [str(i[1]) for i in cards]
@@ -215,7 +216,7 @@ class Stool:
                if kind.count(i) == 4:
                    if int(i) == 1: i = 14
                    return True, i, "Four of kind"
-           return False, 0, "None"
+           return False, 0, "None four of kind"
 
        def check_poker(cards):
            def check():
@@ -226,7 +227,7 @@ class Stool:
                    #print("-----------------------------------------------------")
                    if check_streight(cards[-i - 4:-i])[0] and check_flush(cards[-i - 4:-i])[0]:
                        return True, cards[-i][1], "Streight flush"
-               return False, 0, "None"
+               return False, 0, "None steight flush"
 
            cards = sorted(cards, key=lambda x: int(x[1]))
            result = check()
@@ -283,6 +284,8 @@ game0.deal(talia0, 5)
 
 print("Karta na stole " + str(game0.cards()) + "\n")
 print(game0.check_poker_hand(0))
+print("===================================================================================================")
+print(game0.check_poker_hand(1))
 
 
 #konies testowego modulu rozgrywki dla dwych graczy----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
