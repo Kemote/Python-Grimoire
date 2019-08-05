@@ -100,6 +100,20 @@ class Stool:
            cards_on_hands.append([self.cards_on_stool[i].color, self.cards_on_stool[i].figure])
        return cards_on_hands
 
+   def check_poker_hand(self, player_id):
+       cards = self.cards() + self.players[player_id].cards
+       for i in cards:
+           if i[1] == 'A':
+               i[1] = '1'
+           elif i[1] == 'J':
+               i[1] = '11'
+           elif i[1] == 'Q':
+               i[1] = '12'
+           elif i[1] == 'K':
+               i[1] = '13'
+       print(cards)
+
+''' 
    def check_poker_hand(self, player):
        #print(self.players[player].cards)
        #print(str(self.cards()))
@@ -258,8 +272,7 @@ class Stool:
            return check_one_pair(cards)
        if check_high(cards)[0]:
            return check_high(cards)
-
-
+''' #old check hand which didnt work
 
 #testowa rozgrywka--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
