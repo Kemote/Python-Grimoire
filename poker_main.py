@@ -103,15 +103,20 @@ class Stool:
    def check_poker_hand(self, player_id):
        cards = self.cards() + self.players[player_id].cards
        for i in cards:
-           if i[1] == 'A':
-               i[1] = '1'
-           elif i[1] == 'J':
+           if i[1] == 'J':
                i[1] = '11'
            elif i[1] == 'Q':
                i[1] = '12'
            elif i[1] == 'K':
                i[1] = '13'
+           elif i[1] == 'A':
+               i[1] = '14'
+
+       cards.append(["NONE",'1']) #must execlude this for some hands like for two pairs
+       cards = sorted(cards, key = lambda i: int(i[1]))
+
        print(cards)
+
 
 ''' 
    def check_poker_hand(self, player):
