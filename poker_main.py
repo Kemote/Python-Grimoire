@@ -19,14 +19,14 @@ class Player: #klasa trzymajaca info o graczu
    def cards(self):
        cards_on_hands = []
        for i in range(2):
-           cards_on_hands.append([self.__cards[i].color,self.__cards[i].figure])
+           cards_on_hands.append([self.__cards[i].color, self.__cards[i].figure])
        return cards_on_hands
 
 class Card: #klasa odpowiedzialna za przetrzymywanie info o kartach
    def __init__(self, color, figure):
        self.__color = color
        self.__figure = figure
-       self.__state_hand = False #ta statystyka bedzie mowic czy karta jwest w rece jakiegos gracza
+       self.__state_hand = False #ta statystyka bedzie mowic czy karta jest w rece jakiegos gracza
 
    @property #ten dekorador pozwala na tworzenie obiektów
    def color(self):
@@ -81,7 +81,9 @@ class Deck: #klasa odpowiedzialna za tworzenie talii
        return _hand
 
    def shufle(self):   #----------------------------------dorobić metode tasowania tali i jej zerowania po turz!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-       a = True
+       for i in range(52):
+           self.__cards[i].state_hand_set = False
+           self.__cards_in_game = 0
 
 #testowy modul rozgrywki dla dwych graczy----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 class Stool:
@@ -100,31 +102,9 @@ class Stool:
            cards_on_hands.append([self.cards_on_stool[i].color, self.cards_on_stool[i].figure])
        return cards_on_hands
 
-   def check_poker_hand(self, player_id):
-       cards = self.cards() + self.players[player_id].cards
-       for i in cards:
-           if i[1] == 'J':
-               i[1] = '11'
-           elif i[1] == 'Q':
-               i[1] = '12'
-           elif i[1] == 'K':
-               i[1] = '13'
-           elif i[1] == 'A':
-               i[1] = '14'
-
-       cards.append(["NONE",'1']) #must execlude this for some hands like for two pairs
-       cards = sorted(cards, key = lambda i: int(i[1]))
-
-       print(cards)
-
-
-''' 
    def check_poker_hand(self, player):
-       #print(self.players[player].cards)
-       #print(str(self.cards()))
        cards = []
        cards = self.players[player].cards + self.cards()
-       #print("test takie kary sprawdzane " + str(cards))
        for i in cards:
            if i[1] == 'A':
                i[1] = '1'
@@ -136,9 +116,7 @@ class Stool:
                i[1] = '13'
 
        def check_high(cards):
-           print("CARDS " + str(cards))
            high = [int(i[1]) for i in cards]
-           print("HIGH", high)
            if min(high) == 1:
                return True, 14, "High card"
            return True, max(high), "High card"
@@ -152,29 +130,27 @@ class Stool:
            pair.reverse()
            for i in pair:
                if pair.count(i) == 2:
-                   return True, i, "Pair"
+                   return True, i + 14, "Pair"
            return False, 0, "None one pair"
 
-       # na bank poprawic szyszukiwania dwuch par!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
        def check_two_pairs(cards):
-           two_pairs = cards
-           #print("first pari", two_pairs)
+           two_pairs = cards.copy()
            first_pair = check_one_pair(two_pairs)
            if first_pair:
                for i in two_pairs:
-                   #print(i[1], first_pair[1])
-                   if int(i[1]) == int(first_pair[1]):
-                       #print("T")
+                   if int(i[1]) == first_pair[1] - 14:
                        two_pairs.remove(i)
                if first_pair[1] == '14':
                    for i in two_pairs:
                        if i[1] == '1':
                            two_pairs.remove(i)
-               #cards.reverse()
-               #print("secon pari", two_pairs)
                sec_pair = check_one_pair(two_pairs)
                if sec_pair[0]:
-                   return first_pair, sec_pair, "Two pair"
+                   if first_pair[1] > sec_pair[1]:
+                       i = first_pair[1] + 28
+                   else:
+                       i = sec_pair[1] + 28
+                   return True, i, "Two pair"
            return False, 0, "None two pairs"
 
        def check_three_kind(cards):
@@ -183,7 +159,7 @@ class Stool:
            for i in kind:
                if kind.count(i) == 3:
                    if int(i) == 1: i = 14
-                   return True, i, "Three of kind"
+                   return True, int(i) + 42, "Three of kind"
            return False, 0, "None three of kind"
 
        def check_streight(cards):
@@ -197,35 +173,44 @@ class Stool:
                return False, 0, "None streight"
            for i in range(len(streight) - 4):
                if streight[-i] - streight[-i - 4] == 4:
-                   return True, streight[-i], "Streight"
+                   return True, streight[-i] + 56, "Streight"
            if streight[-1] - streight[-4] == 3 and streight[0] == 1:
-               return True, 14, "Streight"
+               return True, 70, "Streight"
 
-           return False, 0
+           return False, 0, "None streight"
 
        def check_flush(cards):
            color = [i[0] for i in cards]
            for i in ['spades', 'hearts', 'clubs', 'diamonds']:
                if color.count(i) >= 5:
-                   return True, i, "Flush"
+                   result = []
+                   for i2 in cards:
+                       if i2[0] == i:
+                           result.append(int(i2[1]))
+                   return True, max(result) + 70, "Flush"
            return False, 0, "None flush"
 
        def check_full_house(cards):
-           three = check_three_kind(cards)
+           full_house = cards.copy()
+           three = check_three_kind(full_house)
            if three[0]:
-               for i in cards:
-                   if i[1] == three[1]:
-                       cards.remove(i)
+               for i in full_house:
+                   if i[1] == three[1]-42:
+                       full_house.remove(i)
                if three[1] == '14':
-                   for i in cards:
+                   for i in full_house:
                        if i[1] == '1':
-                           cards.remove(i)
-               three_2 = check_three_kind(cards)
+                           full_house.remove(i)
+               three_2 = check_three_kind(full_house)
                if three_2[0]:
-                   return True, three, three_2, "Full house"
-               pair = check_one_pair(cards)
+                   if three[1] > three_2[1]: i = three[1] + 70
+                   else: i = three_2[1] + 70
+                   return True, int(i) + 84, "Full house"
+               pair = check_one_pair(full_house)
                if pair[0]:
-                   return True, three, pair, "Full house"
+                   if three[1] > pair[1]: i = three[1] + 70
+                   else: i = pair[1] + 70
+                   return True, int(i) + 84, "Full house"
            return False, 0, "None full house"
 
        def check_four_of_kind(cards):
@@ -234,18 +219,14 @@ class Stool:
            for i in kind:
                if kind.count(i) == 4:
                    if int(i) == 1: i = 14
-                   return True, i, "Four of kind"
+                   return True, i + 98, "Four of kind"
            return False, 0, "None four of kind"
 
        def check_poker(cards):
            def check():
                for i in range(1, 3):
-                   #print("-----------------------------------------------------")
-                   #print(check_streight(cards[-i - 4:-i])[0])
-                   #print(check_flush(cards[-i - 4:-i])[0])
-                   #print("-----------------------------------------------------")
                    if check_streight(cards[-i - 4:-i])[0] and check_flush(cards[-i - 4:-i])[0]:
-                       return True, cards[-i][1], "Streight flush"
+                       return True, cards[-i][1] + 112, "Streight flush"
                return False, 0, "None steight flush"
 
            cards = sorted(cards, key=lambda x: int(x[1]))
@@ -259,36 +240,81 @@ class Stool:
            result = check()
            return result
 
-       if check_poker(cards)[0]:
-           return check_poker(cards)
-       if check_four_of_kind(cards)[0]:
-           return check_four_of_kind(cards)
-       if check_full_house(cards)[0]:
-           return check_full_house(cards)
-       if check_flush(cards)[0]:
-           return check_flush(cards)
-       if check_streight(cards)[0]:
-           return check_streight(cards)
-       if check_three_kind(cards)[0]:
-           return check_three_kind(cards)
-       if check_two_pairs(cards)[0]:
-           return check_two_pairs(cards)
-       if check_one_pair(cards)[0]:
-           return check_one_pair(cards)
-       if check_high(cards)[0]:
-           return check_high(cards)
-''' #old check hand which didnt work
+       results = [
+          check_poker(cards),
+          check_four_of_kind(cards),
+          check_full_house(cards),
+          check_flush(cards),
+          check_streight(cards),
+          check_three_kind(cards),
+          check_two_pairs(cards),
+          check_one_pair(cards),
+          check_high(cards)]
+
+       for i in results:
+           if i[0]:
+               return i
 
 #testowa rozgrywka--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 print("===|POKEROWA SUPER GRA|===|A||K||Q||J|===" + "\n")
-#name = input("Player name:")    making player is last thing to do
-#player_one = Player(name, 1000)
 
 player0 = Player("Kemote",1000)
 player1 = Player("Alehandro", 1000)
-talia0 = Deck()
+deck = Deck()
+game = Stool(player0, player1)
+blind = True
+negotiation = True
+bid = 0
 
+print("Hi " + player0.name + " and " + player1.name + " you booth have 1000 chips to play \n")
+
+while player0.chips > 0 and player1.chips > 0:
+    deck.shufle()
+    player0.deal(deck)
+    player1.deal(deck)
+
+    print(player0.name + " cards " + str(player0.cards))
+    print(player1.name + " cards " + str(player1.cards))
+
+    #blind
+    if blind:
+        print(player0.name + " blind is yours")
+        player0.chips -= 50
+        bid += 50
+    else:
+        print(player1.name + " blind is yours")
+        player1.chips -= 50
+        bid += 50
+    blind = not blind
+
+    #negotiation
+    while negotiation:
+        p0_state = False
+        p1_state = False
+
+        print(player0.name + " you have " + str(player0.chips) +  " chips, " + player1.name + " you have " + str(player1.chips) + " and stake is " + str(bid))
+        a = input(player0.name + " do you rise? Write how much, if no press 'enter' ")
+        if a == "":
+            p1_state = True
+        else:
+            player0.chips -= int(a)
+            bid += int(a)
+
+        a = input(player1.name + " do you rise? Write how much, if no press 'enter' ")
+        if a == "":
+            p1_state = True
+        else:
+            player1.chips -= int(a)
+            bid += int(a)
+
+
+
+
+
+
+
+'''
 player0.deal(talia0)
 player1.deal(talia0)
 
@@ -299,24 +325,11 @@ print(player0.name + " cards " + str(player0.cards))
 print(player1.name + " cards " + str(player1.cards) + "\n")
 
 game0.deal(talia0, 5)
+print("Cards on stool " + str(game0.cards()) + "\n")
 
-print("Karta na stole " + str(game0.cards()) + "\n")
 print(game0.check_poker_hand(0))
 print("===================================================================================================")
 print(game0.check_poker_hand(1))
 
-
+'''
 #konies testowego modulu rozgrywki dla dwych graczy----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
-#-----------------------------------------------testyyy
-#talia = Deck()
-#buszmen = Player('buszmen', 1000)
-#buszmen.deal(talia)
-#print(buszmen.cards)
-
-
-
-
-#for i in range(0,52):
-#   print(talia.cards[i].color, talia.cards[i].figure,talia.cards[i].state_hand)
