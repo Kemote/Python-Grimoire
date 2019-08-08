@@ -255,28 +255,49 @@ class Stool:
            if i[0]:
                return i
 
-#testowa rozgrywka--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#test=-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-print("===|POKEROWA SUPER GRA|===|A||K||Q||J|===" + "\n")
+print("===|POKEROWA GRA|===|A||K||Q||J|===" + "\n")
 
-player0 = Player("Kemote",1000)
-player1 = Player("Alehandro", 1000)
+#player0 = Player("Kemote",1000)
+#player1 = Player("Alojz", 1000)
+
+players = []
+#test two players
+players.append(Player("Kemote",1000))
+players.append(Player("Alojz", 1000))
+
 deck = Deck()
-game = Stool(player0, player1)
-blind = True
+game = Stool(map(lambda i: i, players))
+play = True
 negotiation = True
 bid = 0
+highest_bid = 0
 
-print("Hi " + player0.name + " and " + player1.name + " you booth have 1000 chips to play \n")
+print("Welcome, every player have 1000 chips")
 
-while player0.chips > 0 and player1.chips > 0:
+while play:
+
+    while negotiation:
+        highest_bid = 50
+        for i in players:
+            input("{} do you want to rise? Highest bid is: {}, you have {} chips. If you want play you must pay at least highset bid".format(i.name, highest_bid, i.chips))
+    # check if anybody in game
+    if len(players) == 1:
+        play = False
+
+'''
+while players[0].chips > 0 and players[1].chips > 0:
     deck.shufle()
-    player0.deal(deck)
-    player1.deal(deck)
+    players[0].deal(deck)
+    players[1].deal(deck)
 
-    print(player0.name + " cards " + str(player0.cards))
-    print(player1.name + " cards " + str(player1.cards))
+    print(players[0].name + " cards " + str(players[0].cards))
+    print(players[1].name + " cards " + str(players[1].cards))
 
+
+
+    
     #blind
     if blind:
         print(player0.name + " blind is yours")
@@ -293,6 +314,11 @@ while player0.chips > 0 and player1.chips > 0:
         p0_state = False
         p1_state = False
 
+        if blind:
+            
+
+
+
         print(player0.name + " you have " + str(player0.chips) +  " chips, " + player1.name + " you have " + str(player1.chips) + " and stake is " + str(bid))
         a = input(player0.name + " do you rise? Write how much, if no press 'enter' ")
         if a == "":
@@ -307,7 +333,7 @@ while player0.chips > 0 and player1.chips > 0:
         else:
             player1.chips -= int(a)
             bid += int(a)
-
+'''
 
 
 
