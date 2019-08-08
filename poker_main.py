@@ -281,7 +281,13 @@ while play:
     while negotiation:
         highest_bid = 50
         for i in players:
-            input("{} do you want to rise? Highest bid is: {}, you have {} chips. If you want play you must pay at least highset bid".format(i.name, highest_bid, i.chips))
+            player_bid = input("{} do you want to rise? Highest bid is: {}, you have {} chips. If you want play you must pay at least highset bid".format(i.name, highest_bid, i.chips))
+
+            if player_bid > i.chips:
+                player_bid = i.chips
+            i.chips -= player_bid
+            bid += player_bid
+
     # check if anybody in game
     if len(players) == 1:
         play = False
